@@ -9,6 +9,34 @@ var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
 
 var app = express();
+// database connection
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/deevesoft', {});
+// on connect
+mongoose.connection.on('connected', function() {
+  console.log('database connected');
+});
+// on disconnect
+mongoose.connection.on('disconnected', function() {
+  console.log('database disconnected');
+});
+// on error
+mongoose.connection.on('err', function(err) {
+  console.log('database connection error: ' + err);
+});
+
+//on node termination
+process.on('beforeExit', function() {
+  mongoose.disconnect(function() {
+    console.log('database disconnect before exit');
+  });
+});
+process.on('SIGINT', function() {
+  mongoose.disconnect(function() {
+    console.log('database disconnect CTRL+C');
+  });
+  process.exit(0);
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

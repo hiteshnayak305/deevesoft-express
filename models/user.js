@@ -3,11 +3,10 @@ var mongoose = require('mongoose');
 
 // define the schema for our user model
 var userSchema = mongoose.Schema({
-    _id: {
+    id: {
         type: Number,
         default: -1,
-        index: true,
-        unique: true
+        index: true
     },
     username: {
         type: String,
@@ -15,7 +14,8 @@ var userSchema = mongoose.Schema({
     },
     description: {
         type: String,
-        required: false
+        default:''
+        //required: false
     },
     state: {
         type: String,
@@ -29,18 +29,18 @@ var userSchema = mongoose.Schema({
     },
     ethnicity: {
         type: Number,
-        required: true,
-        enum: [0, 1]
+        //required: true,
+        enum: [-1, 0, 1]
     },
     race: {
         type: Number,
-        required: true,
-        enum: [0, 1, 2, 3, 4]
+        //required: true,
+        enum: [-1, 0, 1, 2, 3, 4]
     },
     sex: {
         type: Number,
         required: true,
-        enum: [0, 1, 2]
+        enum: [-1, 0, 1, 2]
     },
     height: {
         type: Number,
@@ -58,7 +58,17 @@ var userSchema = mongoose.Schema({
 *
 */
 
-// get ethnicity stored number
+// set and get ethnicity stored number
+userSchema.methods.setEthnicity = function(ethnicity) {
+    switch(ethnicity) {
+        case 'hispanic or latino':
+            return 0;
+        case 'non hispanic or non latino': 
+            return 1;
+        default:
+            return -1;
+    }
+};
 userSchema.methods.getEthnicity = function(ethnicity) {
     switch(ethnicity) {
         case 0:
@@ -70,7 +80,23 @@ userSchema.methods.getEthnicity = function(ethnicity) {
     }
 };
 
-// get race stored number
+// set and get race stored number
+userSchema.methods.setRace = function(race) {
+    switch(race) {
+        case 'american indian':
+            return 0;
+        case 'asian': 
+            return 1;
+        case 'native hawaiian or other pacific islander':
+            return 2;
+        case 'Black or other african american':
+            return 3;
+        case 'white':
+            return 4;
+        default:
+            return -1;
+    }
+};
 userSchema.methods.getRace = function(race) {
     switch(race) {
         case 0:
@@ -87,7 +113,20 @@ userSchema.methods.getRace = function(race) {
             return 'undefined';
     }
 };
-// get sex stored as number
+
+// set and get sex stored as number
+userSchema.methods.setSex = function(sex) {
+    switch(sex) {
+        case 'male':
+            return 0;
+        case 'female': 
+            return 1;
+        case 'other':
+            return 2;
+        default:
+            return -1;
+    }
+};
 userSchema.methods.getSex = function(sex) {
     switch(sex) {
         case 0:
