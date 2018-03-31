@@ -2,13 +2,13 @@ var User = require('../models/user');
 
 module.exports = function(req, res, next) {
     console.log('in addUser.js');
-    console.log(req.body);
+    //console.log(req.body);
     // check for existing username
     User.findOne({'username': req.body.username}, function(error, response) {
         // if any error occured
         if(error) {
             console.log('error occured: ' + error.status);
-            res.status(error.status | 500).json({status: 'error occured'});
+            res.status(error.status || 500).json({status: 'error occured'});
         }
         // if response is null add user
         if(!response) {
@@ -32,18 +32,26 @@ module.exports = function(req, res, next) {
             User.find().count(function(error1, count) {
                 if(error1) {
                     console.log('error occured: ' + error1);
-                    res.status(error1.status | 500).json({status: 'error occured'});
+                    res.status(error1.status || 500).json({status: 'error occured'});
                 }
                 user.id = count;
                 // write to db
-                user.save();
-                next();
+                user.save(function(error2, user2) {
+                    if(error2) {
+                        console.log('validation error occured: ' + error2);
+                        res.status(error2.status || 500).json({status: error2});
+                    }
+                    if(user2) {
+                        console.log('added successfully');
+                        res.status(200).json({status: 'successful'});
+                    } 
+                });
             });
         }
         // if response is not null reject
         else {
             console.log('response not null');
-            console.log(response);
+            //console.log(response);
             res.status(200).json({status: 'user already exist'});
         }
     });

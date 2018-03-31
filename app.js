@@ -9,9 +9,13 @@ var indexRouter = require('./routes/index');
 var apiRouter = require('./routes/api');
 
 var app = express();
+
+// configuration according to environment
+var config = require('./config/config')[app.get('env')];
+
 // database connection
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/deevesoft', {});
+mongoose.connect(config.database.url , {});
 // on connect
 mongoose.connection.on('connected', function() {
   console.log('database connected');
@@ -48,6 +52,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+  next();
+});
+
 // routes configuration
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
@@ -56,6 +67,13 @@ app.use('/api', apiRouter);
 app.use(function(req, res, next) {
   next(createError(404));
 });
+
+// json error handler
+/* app.use(function(err, req, res, next) {
+  // render the json data
+  res.status(err.status || 500).json({status:'invalid url'});
+  next(err);
+}); */
 
 // error handler
 app.use(function(err, req, res, next) {
